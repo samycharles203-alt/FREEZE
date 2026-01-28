@@ -1,11 +1,12 @@
-const { getTime, drive } = global.utils;
+const { getTime } = global.utils;
+
 if (!global.temp.welcomeEvent)
 	global.temp.welcomeEvent = {};
 
 module.exports = {
 	config: {
 		name: "welcome",
-		version: "2.0",
+		version: "2.1",
 		author: "FREEZE",
 		category: "events"
 	},
@@ -15,39 +16,44 @@ module.exports = {
 
 		const { threadID } = event;
 		const prefix = global.utils.getPrefix(threadID);
-		const timeNow = getTime("HH:mm");
+		const timeNow = getTime("HH:mm:ss");
 		const addedUsers = event.logMessageData.addedParticipants;
 
-		// 🧊 IF BOT IS ADDED
+		// 🧊 BOT ADDED TO GROUP
 		if (addedUsers.some(u => u.userFbId == api.getCurrentUserID())) {
 			const threadData = await threadsData.get(threadID);
 
-			return message.send(
-`× •-•-•-•⟮ 𝗙𝗥𝗘𝗘𝗭𝗘 ⟯•-•-•-• ×
+			return message.send({
+				body:
+`╭─────♡◉◉◉♡─────⌬
+💖 ʜᴇʟʟᴏ everyone 💋!
+🌸 ᴡᴇʟᴄᴏᴍᴇ me to the group
+🤍 「 ${threadData.threadName} 」 🤍
 
-❄️✨ Greetings, everyone ✨❄️
+📅 𝗗𝗮𝘁𝗲: ${getTime("DD/MM/YYYY")}
+⌚ 𝘁𝗶𝗺𝗲: ${timeNow}
 
-Thank you for adding me to this elegant group 🤍
-I am FREEZE — your premium assistant 🤖💎
+👑 Owner: Samy Charles
 
-🏛️ Group: ${threadData.threadName}
-🕒 Activated at: ${timeNow}
+🍁 Thank you for adding me to this beautiful group!
+✨ I am FREEZE — your premium assistant
+❄️ Type ${prefix}help to explore my commands
 
-🔑 Prefix: ${prefix}
-📖 Type ${prefix}help to see my commands
-
-❄️💎 Welcome to excellence 💎❄️
-
-× •-•-•-•⟮ 𝗙𝗥𝗘𝗘𝗭𝗘 ⟯•-•-•-• ×`
-			);
+🦅 © 𝙁𝙧𝙚𝙚𝙯𝙚 𝙗𝙤𝙩
+╰─────♡◉◉◉♡─────⌬`,
+				mentions: [
+					{ tag: "Samy Charles", id: "61586092556175" }
+				]
+			});
 		}
 
-		// 🧊 NEW MEMBERS
-		if (!global.temp.welcomeEvent[threadID])
+		// 🧊 NEW MEMBERS JOINED
+		if (!global.temp.welcomeEvent[threadID]) {
 			global.temp.welcomeEvent[threadID] = {
 				timeout: null,
 				users: []
 			};
+		}
 
 		global.temp.welcomeEvent[threadID].users.push(...addedUsers);
 		clearTimeout(global.temp.welcomeEvent[threadID].timeout);
@@ -55,10 +61,6 @@ I am FREEZE — your premium assistant 🤖💎
 		global.temp.welcomeEvent[threadID].timeout = setTimeout(async () => {
 			const threadData = await threadsData.get(threadID);
 			if (threadData.settings?.sendWelcomeMessage === false) return;
-
-			const memberCount = threadData.participantIDs.length;
-			const adderID = event.author;
-			const adderName = (await api.getUserInfo(adderID))[adderID].name;
 
 			const names = [];
 			const mentions = [];
@@ -68,29 +70,25 @@ I am FREEZE — your premium assistant 🤖💎
 				mentions.push({ tag: u.fullName, id: u.userFbId });
 			}
 
+			mentions.push({ tag: "Samy Charles", id: "61586092556175" });
+
 			const welcomeMessage =
-`× •-•-•-•⟮ 𝗙𝗥𝗘𝗘𝗭𝗘 ⟯•-•-•-• ×
+`╭─────♡◉◉◉♡─────⌬
+💖 ʜᴇʟʟᴏ ${names.join(", ")} 💋!
+🌸 ᴡᴇʟᴄᴏᴍᴇ to the group
+🤍 「 ${threadData.threadName} 」 🤍
 
-💎✨ Welcome, ${names.join(", ")} ✨💎
+📅 𝗗𝗮𝘁𝗲: ${getTime("DD/MM/YYYY")}
+⌚ 𝘁𝗶𝗺𝗲: ${getTime("HH:mm:ss")}
 
-You have joined an elegant and exclusive space.
-🤍🏛️ 「 ${threadData.threadName} 」 🏛️🤍
+👑 Owner: Samy Charles
 
-➕ Gracefully invited by:
-👤✨ ${adderName}
+🍁 We are truly happy to have you here!
+✨ Please respect everyone and keep a positive vibe
+❄️ Enjoy your time in the FREEZE Circle
 
-📊✨ Group Overview:
-👥🤍 Total Members: ${memberCount}
-🕒⏳ Time of Entry: ${timeNow}
-
-🌟✨ Please enjoy a refined experience:
-🤍 Respect & kindness
-💬 Quality conversations
-🌿 Positive energy only
-
-❄️👑 Welcome to the FREEZE Circle 👑❄️
-
-× •-•-•-•⟮ 𝗙𝗥𝗘𝗘𝗭𝗘 ⟯•-•-•-• ×`;
+🦅 © 𝙁𝙧𝙚𝙚𝙯𝙚 𝙗𝙤𝙩
+╰─────♡◉◉◉♡─────⌬`;
 
 			message.send({
 				body: welcomeMessage,
